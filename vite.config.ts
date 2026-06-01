@@ -12,7 +12,7 @@ export default defineConfig({
     __PUBLIC_ASSET_VERSION__: JSON.stringify(publicAssetVersion),
   },
   plugins: [react()],
-  publicDir: "Public",
+  publicDir: "public",
   server: {
     host: true,
   },
