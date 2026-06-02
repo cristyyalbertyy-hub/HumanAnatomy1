@@ -177,8 +177,9 @@ export function resolveLesson(
 /** Curriculum label → filename stem in `public/`. */
 const MEDIA_STEM: Record<string, string> = {
   LS_OS_SK: "LS_O_S",
-  LS_OS_AS: "LS_O_AS",
-  LS_OS_APS: "LS_O_APS",
+  // File stems were swapped on disk: AS_* holds appendicular, APS_* holds axial.
+  LS_OS_AS: "LS_O_APS",
+  LS_OS_APS: "LS_O_AS",
   LS_AR_JD: "LS_A_JD",
   LS_AR_VC: "LS_A_VC",
   LS_AR_THX: "LS_A_T",

@@ -31,21 +31,9 @@ export default function App() {
         alt="Human Anatomy I — course overview"
         className="overview-infographic"
       />
-      <div className="overview-chapters" role="navigation" aria-label="Course chapters">
-        {systems.map((system) => (
-          <button
-            key={system.id}
-            type="button"
-            className="overview-chapter-btn"
-            onClick={() => {
-              setAtHome(false);
-              setOpenSystems((o) => ({ ...o, [system.id]: true }));
-            }}
-          >
-            {system.title}
-          </button>
-        ))}
-      </div>
+      <p className="overview-hint muted">
+        Use the menu on the left to open a chapter and choose a sub-topic.
+      </p>
     </div>
   );
 
@@ -108,17 +96,15 @@ export default function App() {
         <h1>{courseTitle}</h1>
       </header>
 
-      <div className={`layout${atHome ? " layout--overview" : ""}`}>
-        {!atHome ? (
-          <CourseNav
-            openSystems={openSystems}
-            openSections={openSections}
-            selection={selection}
-            onToggleSystem={toggleSystem}
-            onToggleSection={toggleSection}
-            onSelectLesson={selectLesson}
-          />
-        ) : null}
+      <div className="layout">
+        <CourseNav
+          openSystems={openSystems}
+          openSections={openSections}
+          selection={selection}
+          onToggleSystem={toggleSystem}
+          onToggleSection={toggleSection}
+          onSelectLesson={selectLesson}
+        />
 
         <main
           ref={mainRef}
