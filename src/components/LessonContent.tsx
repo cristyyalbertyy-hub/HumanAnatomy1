@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { type ResolvedLesson } from "../data/curriculum";
 import {
-  infographicUrl,
-  podcastUrl,
-  questionnairePathFor,
-  videoUrl,
-  type ResolvedLesson,
-} from "../data/curriculum";
+  infographicPathCandidates,
+  podcastPathCandidates,
+  questionnairePathCandidates,
+  videoPathCandidates,
+} from "../utils/mediaPaths";
 import { assetUrl } from "../utils/assetUrl";
 import { MediaBlock } from "./MediaBlock";
 import { MediaTabs, type MediaTabId } from "./MediaTabs";
+import { MediaWithFallback } from "./MediaWithFallback";
 import { Questionnaire } from "./Questionnaire";
 
 type Props = { lesson: ResolvedLesson };
@@ -24,10 +25,15 @@ export function LessonContent({ lesson }: Props) {
     setTab("video");
   }, [assetCode]);
 
-  const qPath = assetUrl(questionnairePathFor(assetCode, questionnairePath));
-  const audioUrl = assetUrl(podcastUrl(assetCode));
-  const imageUrl = assetUrl(infographicUrl(assetCode));
-  const videoPrimary = assetUrl(videoUrl(assetCode));
+  const videoPaths = videoPathCandidates(assetCode);
+  const audioPaths = podcastPathCandidates(assetCode);
+  const imagePaths = infographicPathCandidates(assetCode);
+  const qPaths = questionnairePathCandidates(assetCode, questionnairePath);
+
+  const videoKey = videoPaths.map((p) => assetUrl(p)).join("|");
+  const audioKey = audioPaths.map((p) => assetUrl(p)).join("|");
+  const imageKey = imagePaths.map((p) => assetUrl(p)).join("|");
+  const qKey = qPaths.map((p) => assetUrl(p)).join("|");
 
   return (
     <div className="lesson-view">
@@ -46,37 +52,58 @@ export function LessonContent({ lesson }: Props) {
         aria-labelledby={`tab-${tab}`}
       >
         {tab === "video" ? (
-          <MediaBlock key={`${assetCode}-v`} urlKey={videoPrimary} bare>
+          <MediaBlock key={`${assetCode}-v`} urlKey={videoKey} bare>
             {({ onMissing }) => (
-              <video
-                className="video"
-                controls
-                preload="metadata"
-                src={videoPrimary}
-                onError={onMissing}
+              <MediaWithFallback
+                paths={videoPaths}
+                urlKey={videoKey}
+                onExhausted={onMissing}
+                render={({ src, onError }) => (
+                  <video
+                    className="video"
+                    controls
+                    preload="metadata"
+                    src={src}
+                    onError={onError}
+                  />
+                )}
               />
             )}
           </MediaBlock>
         ) : null}
 
         {tab === "podcast" ? (
-          <MediaBlock key={`${assetCode}-p`} urlKey={audioUrl} bare>
+          <MediaBlock key={`${assetCode}-p`} urlKey={audioKey} bare>
             {({ onMissing }) => (
-              <audio className="audio" controls preload="metadata" src={audioUrl} onError={onMissing}>
-                Podcast
-              </audio>
+              <MediaWithFallback
+                paths={audioPaths}
+                urlKey={audioKey}
+                onExhausted={onMissing}
+                render={({ src, onError }) => (
+                  <audio className="audio" controls preload="metadata" src={src} onError={onError}>
+                    Podcast
+                  </audio>
+                )}
+              />
             )}
           </MediaBlock>
         ) : null}
 
         {tab === "infographic" ? (
-          <MediaBlock key={`${assetCode}-i`} urlKey={imageUrl} bare>
+          <MediaBlock key={`${assetCode}-i`} urlKey={imageKey} bare>
             {({ onMissing }) => (
-              <img
-                className="infographic"
-                src={imageUrl}
-                alt={`Infographic: ${title}`}
-                onError={onMissing}
+              <MediaWithFallback
+                paths={imagePaths}
+                urlKey={imageKey}
+                onExhausted={onMissing}
+                render={({ src, onError }) => (
+                  <img
+                    className="infographic"
+                    src={src}
+                    alt={`Infographic: ${title}`}
+                    onError={onError}
+                  />
+                )}
               />
             )}
           </MediaBlock>
@@ -84,7 +111,7 @@ export function LessonContent({ lesson }: Props) {
 
         {tab === "questions" ? (
           <div key={`${assetCode}-q`} className="media-panel media-panel--questions">
-            <Questionnaire src={qPath} />
+            <Questionnaire paths={qPaths} urlKey={qKey} />
           </div>
         ) : null}
       </div>

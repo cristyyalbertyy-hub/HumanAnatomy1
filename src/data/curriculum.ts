@@ -1,4 +1,4 @@
-/** Leaf lesson — media stem is `assetCode` (e.g. CLS_PH → CLS_PH_V.mp4). */
+/** Leaf lesson — `assetCode` is the curriculum label (e.g. LS_OS_SK); files use `mediaAssetStem()`. */
 export type Topic = {
   id: string;
   title: string;
@@ -174,16 +174,46 @@ export function resolveLesson(
   };
 }
 
+/** Curriculum label → filename stem in `public/`. */
+const MEDIA_STEM: Record<string, string> = {
+  LS_OS_SK: "LS_O_S",
+  LS_OS_AS: "LS_O_AS",
+  LS_OS_APS: "LS_O_APS",
+  LS_AR_JD: "LS_A_JD",
+  LS_AR_VC: "LS_A_VC",
+  LS_AR_THX: "LS_A_T",
+  LS_AR_LIM: "LS_A_L",
+  LS_MY_NTM: "LS_M_NTM",
+  LS_MY_CAM: "LS_M_CAM",
+  LS_MY_LM: "LS_M_LM",
+  RS_OC_TT: "RSC_OC_TT",
+  RS_OC_SG: "RSC_OC_SG",
+  RS_OC_FM: "RSC_OC_FM",
+  RS_NCS: "RSC_NCS",
+  RS_PL: "RSC_PL",
+  RS_TL: "RSC_TL",
+  RS_PM: "RSC_PM",
+};
+
+export function mediaAssetStem(assetCode: string): string {
+  return MEDIA_STEM[assetCode] ?? assetCode;
+}
+
 export function videoUrl(assetCode: string): string {
-  return `/${assetCode}_V.mp4`;
+  const stem = mediaAssetStem(assetCode);
+  if (stem === "LS_A_JD") return `/${stem}_Dx.mp4`;
+  if (stem.startsWith("LS_AT_") || stem.startsWith("CLS_")) {
+    return `/${stem}_V.mp4`;
+  }
+  return `/${stem}_Vx.mp4`;
 }
 
 export function podcastUrl(assetCode: string): string {
-  return `/${assetCode}_P.m4a`;
+  return `/${mediaAssetStem(assetCode)}_P.m4a`;
 }
 
 export function infographicUrl(assetCode: string): string {
-  return `/${assetCode}_I.png`;
+  return `/${mediaAssetStem(assetCode)}_I.png`;
 }
 
 export function questionnairePathFor(
@@ -191,5 +221,5 @@ export function questionnairePathFor(
   override?: string,
 ): string {
   if (override) return override;
-  return `/${assetCode}_Q.csv`;
+  return `/${mediaAssetStem(assetCode)}_Q.csv`;
 }

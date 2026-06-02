@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { assetUrl } from "../utils/assetUrl";
 import { parseCsvRows } from "../utils/parseCsv";
 
-type Props = { src: string };
+type Props = { paths: string[]; urlKey: string };
 
-export function Questionnaire({ src }: Props) {
+export function Questionnaire({ paths, urlKey }: Props) {
   const [items, setItems] = useState<{ question: string; answer: string }[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<Record<number, boolean>>({});
@@ -12,23 +13,31 @@ export function Questionnaire({ src }: Props) {
     let cancelled = false;
     setItems(null);
     setError(null);
-    fetch(src)
-      .then((r) => {
-        if (!r.ok) throw new Error(`Could not load questionnaire (${r.status}).`);
-        return r.text();
-      })
-      .then((t) => {
-        if (cancelled) return;
-        setItems(parseCsvRows(t));
-      })
-      .catch((e: unknown) => {
-        if (cancelled) return;
-        setError(e instanceof Error ? e.message : "Failed to load.");
-      });
+
+    (async () => {
+      let lastError = "Could not load questionnaire.";
+      for (const path of paths) {
+        try {
+          const r = await fetch(assetUrl(path));
+          if (!r.ok) {
+            lastError = `Could not load questionnaire (${r.status}).`;
+            continue;
+          }
+          const text = await r.text();
+          if (cancelled) return;
+          setItems(parseCsvRows(text));
+          return;
+        } catch (e: unknown) {
+          lastError = e instanceof Error ? e.message : "Failed to load.";
+        }
+      }
+      if (!cancelled) setError(lastError);
+    })();
+
     return () => {
       cancelled = true;
     };
-  }, [src]);
+  }, [urlKey, paths]);
 
   if (error) return <p className="muted">{error}</p>;
   if (!items) return <p className="muted">Loading questions…</p>;

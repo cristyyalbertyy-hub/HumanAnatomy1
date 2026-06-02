@@ -27,7 +27,14 @@ export function MediaBlock({ label, description, urlKey, bare, children }: Props
         <div className="missing-box">
           <p>No file is available for this section yet.</p>
           <p className="muted small">
-            Add the asset under <code>Public</code> using the naming pattern for this subchapter.
+            Expected under <code>public/</code>
+            {urlKey ? (
+              <>
+                {" "}
+                (for example <code>{urlKey.split("|")[0]?.replace(/^\//, "")}</code>)
+              </>
+            ) : null}
+            .
           </p>
         </div>
       ) : (

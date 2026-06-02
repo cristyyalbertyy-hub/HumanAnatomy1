@@ -131,7 +131,7 @@ export default function App() {
           ) : (
             <div className="browse-view">
               <div className="media-stage media-stage--placeholder">
-                <p>Choose a sub-topic in the menu (for example <code>LS_AT_S</code>).</p>
+                <p>Choose a sub-topic in the menu (for example <code>LS_OS_SK</code>).</p>
               </div>
             </div>
           )}
