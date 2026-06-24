@@ -18,6 +18,8 @@ export type Section = {
 export type System = {
   id: string;
   title: string;
+  /** Chapter bar colour (Moral Philosophy palette). */
+  color: string;
   sections: Section[];
 };
 
@@ -27,6 +29,7 @@ export const systems: System[] = [
   {
     id: "ls",
     title: "Locomotor System",
+    color: "#14213d",
     sections: [
       {
         id: "ls-at",
@@ -70,6 +73,7 @@ export const systems: System[] = [
   {
     id: "cls",
     title: "Cardiovascular and Lymphatic Systems",
+    color: "#2d4636",
     sections: [
       {
         id: "cls-ph",
@@ -94,6 +98,7 @@ export const systems: System[] = [
   {
     id: "rs",
     title: "Respiratory System and Cavities",
+    color: "#d36b31",
     sections: [
       {
         id: "rs-oc",

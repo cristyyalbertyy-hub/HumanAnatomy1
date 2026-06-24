@@ -29,21 +29,16 @@ function sectionKey(systemId: string, sectionId: string): string {
 
 function LessonCard({
   title,
-  code,
   active,
   onClick,
 }: {
   title: string;
-  code: string;
   active: boolean;
   onClick: () => void;
 }) {
   return (
     <button type="button" className={`lesson-card${active ? " active" : ""}`} onClick={onClick}>
-      <span className="lesson-card-body">
-        <span className="lesson-card-title">{title}</span>
-        <span className="lesson-card-code">{code}</span>
-      </span>
+      <span className="lesson-card-title">{title}</span>
       <span className="lesson-card-arrow" aria-hidden>
         ›
       </span>
@@ -73,7 +68,6 @@ function TopicItem({
     <li className="nav-topic-item">
       <LessonCard
         title={topic.title}
-        code={topic.assetCode}
         active={active}
         onClick={() =>
           onSelectLesson({
@@ -117,7 +111,6 @@ function SectionBlock({
       <li className="nav-section-leaf">
         <LessonCard
           title={section.title}
-          code={section.assetCode}
           active={isLeafActive}
           onClick={() =>
             onSelectLesson({ systemId: system.id, sectionId: section.id, topicId: null })
@@ -191,6 +184,7 @@ export function CourseNav({
             <button
               type="button"
               className="accordion-trigger accordion-trigger--system"
+              style={{ backgroundColor: system.color }}
               aria-expanded={sysOpen}
               onClick={() => onToggleSystem(system.id)}
             >

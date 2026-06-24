@@ -83,15 +83,17 @@ export default function App() {
       <header className="app-header">
         <button
           type="button"
-          className="home-thumb"
+          className="home-overview-btn"
           onClick={goToEntry}
           aria-label="Back to course overview"
-          title="Course overview"
         >
-          <img src={overviewImage} alt="" onError={(e) => (e.currentTarget.style.display = "none")} />
-          <span className="home-thumb-fallback" aria-hidden>
-            ⊕
+          <span className="home-overview-btn__media">
+            <img src={overviewImage} alt="" onError={(e) => (e.currentTarget.style.display = "none")} />
+            <span className="home-overview-btn__fallback" aria-hidden>
+              ⊕
+            </span>
           </span>
+          <span className="home-overview-btn__label">Course overview</span>
         </button>
         <h1>{courseTitle}</h1>
       </header>
@@ -117,7 +119,7 @@ export default function App() {
           ) : (
             <div className="browse-view">
               <div className="media-stage media-stage--placeholder">
-                <p>Choose a sub-topic in the menu (for example <code>LS_OS_SK</code>).</p>
+                <p>Choose a sub-topic in the menu on the left to open a lesson.</p>
               </div>
             </div>
           )}

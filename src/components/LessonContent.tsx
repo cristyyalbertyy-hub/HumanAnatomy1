@@ -40,7 +40,6 @@ export function LessonContent({ lesson }: Props) {
       <header className="subchapter-head">
         <p className="eyebrow">{breadcrumb}</p>
         <h2>{title}</h2>
-        <p className="lesson-code">{assetCode}</p>
       </header>
 
       <MediaTabs active={tab} onChange={setTab} />
