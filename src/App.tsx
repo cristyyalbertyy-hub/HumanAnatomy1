@@ -17,6 +17,7 @@ export default function App() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [selection, setSelection] = useState<LessonSelection | null>(null);
   const [atHome, setAtHome] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(true);
   const mainRef = useRef<HTMLElement>(null);
 
   const lesson = useMemo(() => useLessonFromSelection(selection), [selection]);
@@ -35,6 +36,27 @@ export default function App() {
     if (!system || !section) return null;
     return { system, section };
   }, [selection, lesson]);
+
+  const mobileLessonContext = useMemo(() => {
+    if (lesson) {
+      return {
+        chapter: lesson.system.title,
+        subchapter: lesson.topic?.title ?? lesson.section.title,
+        color: lesson.system.color,
+      };
+    }
+    if (browsingContext) {
+      return {
+        chapter: browsingContext.system.title,
+        subchapter: browsingContext.section.title,
+        color: browsingContext.system.color,
+      };
+    }
+    return null;
+  }, [lesson, browsingContext]);
+
+  const showMobileLessonBar = !mobileMenuOpen && !atHome && mobileLessonContext !== null;
+  const shellMode = mobileMenuOpen ? "is-mobile-menu" : "is-mobile-content";
 
   const overviewImage = assetUrl("/HumanAnatomy.png");
 
@@ -66,8 +88,11 @@ export default function App() {
         className="overview-infographic"
       />
       <p className="overview-hint muted">
-        Open a coloured chapter on the left, then choose a sub-topic to start.
+        Open a coloured chapter below, then choose a sub-topic to start.
       </p>
+      <button type="button" className="mobile-browse-btn" onClick={() => setMobileMenuOpen(true)}>
+        Browse chapters →
+      </button>
     </div>
   );
 
@@ -82,6 +107,7 @@ export default function App() {
   const selectLesson = (sel: LessonSelection) => {
     setAtHome(false);
     setSelection(sel);
+    setMobileMenuOpen(false);
 
     const nextSystems = collapsedRecord(systems.map((s) => s.id));
     nextSystems[sel.systemId] = true;
@@ -108,13 +134,18 @@ export default function App() {
   const goToEntry = () => {
     setAtHome(true);
     setSelection(null);
+    setMobileMenuOpen(false);
     setOpenSystems(collapsedRecord(systems.map((s) => s.id)));
     setOpenSections({});
   };
 
+  const openMobileMenu = () => {
+    setMobileMenuOpen(true);
+  };
+
   return (
-    <div className="app-shell">
-      <header className="app-header">
+    <div className={`app-shell ${shellMode}`}>
+      <header className={`app-header${showMobileLessonBar ? " app-header--compact-mobile" : ""}`}>
         <button
           type="button"
           className="home-overview-btn"
@@ -131,6 +162,21 @@ export default function App() {
         </button>
         <h1>{courseTitle}</h1>
       </header>
+
+      {showMobileLessonBar && mobileLessonContext ? (
+        <div
+          className="mobile-lesson-bar"
+          style={{ borderLeftColor: mobileLessonContext.color }}
+        >
+          <button type="button" className="mobile-menu-back" onClick={openMobileMenu}>
+            ← Menu
+          </button>
+          <div className="mobile-lesson-bar__text">
+            <span className="mobile-lesson-bar__chapter">{mobileLessonContext.chapter}</span>
+            <span className="mobile-lesson-bar__sub">{mobileLessonContext.subchapter}</span>
+          </div>
+        </div>
+      ) : null}
 
       <div className="layout">
         <CourseNav
