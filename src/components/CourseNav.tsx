@@ -180,7 +180,7 @@ export function CourseNav({
       {systems.map((system) => {
         const sysOpen = openSystems[system.id] ?? false;
         return (
-          <div key={system.id} className={`accordion accordion--system${sysOpen ? " is-open" : ""}`}>
+          <div key={system.id} className={`accordion accordion--system${sysOpen ? " is-open" : ""}`} data-system={system.id}>
             <button
               type="button"
               className="accordion-trigger accordion-trigger--system"
@@ -194,7 +194,7 @@ export function CourseNav({
               <span className="system-name">{system.title}</span>
             </button>
             {sysOpen ? (
-              <div className="section-tree">
+              <div className="section-tree" style={{ borderTopColor: system.color }}>
                 <ul className="section-list">
                   {system.sections.map((section) => (
                     <SectionBlock

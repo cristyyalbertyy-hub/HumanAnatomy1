@@ -22,17 +22,51 @@ export default function App() {
   const lesson = useMemo(() => useLessonFromSelection(selection), [selection]);
   const isBrowsing = !lesson && !atHome;
 
+  const activeSystemId = useMemo(() => {
+    if (lesson) return lesson.system.id;
+    if (selection && !atHome) return selection.systemId;
+    return systems.find((s) => openSystems[s.id])?.id ?? null;
+  }, [lesson, selection, atHome, openSystems]);
+
+  const browsingContext = useMemo(() => {
+    if (!selection || lesson) return null;
+    const system = systems.find((s) => s.id === selection.systemId);
+    const section = system?.sections.find((sec) => sec.id === selection.sectionId);
+    if (!system || !section) return null;
+    return { system, section };
+  }, [selection, lesson]);
+
   const overviewImage = assetUrl("/HumanAnatomy.png");
 
   const overviewPanel = (
     <div className="overview-panel">
+      <div className="overview-intro">
+        <p className="overview-lead">
+          Locomotor, cardiovascular and respiratory anatomy — three systems with video, podcast,
+          infographic and quiz for each sub-topic.
+        </p>
+        <ul className="overview-systems" aria-label="Course systems">
+          {systems.map((system) => (
+            <li
+              key={system.id}
+              className="overview-systems__item"
+              style={{ borderLeftColor: system.color }}
+            >
+              <strong>{system.title}</strong>
+              <span>
+                {system.sections.length} {system.sections.length === 1 ? "section" : "sections"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
       <img
         src={overviewImage}
         alt="Human Anatomy I — course overview"
         className="overview-infographic"
       />
       <p className="overview-hint muted">
-        Use the menu on the left to open a chapter and choose a sub-topic.
+        Open a coloured chapter on the left, then choose a sub-topic to start.
       </p>
     </div>
   );
@@ -111,6 +145,7 @@ export default function App() {
         <main
           ref={mainRef}
           className={`main${atHome ? " main--overview" : ""}${isBrowsing ? " main--browsing" : ""}`}
+          data-system-tint={activeSystemId ?? undefined}
         >
           {atHome ? (
             overviewPanel
@@ -119,7 +154,17 @@ export default function App() {
           ) : (
             <div className="browse-view">
               <div className="media-stage media-stage--placeholder">
-                <p>Choose a sub-topic in the menu on the left to open a lesson.</p>
+                {browsingContext ? (
+                  <>
+                    <p className="eyebrow">{browsingContext.system.title}</p>
+                    <h2 className="browse-title">{browsingContext.section.title}</h2>
+                    <p className="browse-hint">
+                      Pick a sub-topic in the menu to open video, podcast, infographic and questions.
+                    </p>
+                  </>
+                ) : (
+                  <p>Choose a coloured chapter in the menu on the left, then select a sub-topic.</p>
+                )}
               </div>
             </div>
           )}
