@@ -9,7 +9,7 @@ export type BibliographyEntry = {
 export const furtherStudyTitle = "Further study";
 
 export const furtherStudyIntro =
-  "When you want to go deeper after a Studio9 lesson, we recommend these books for your own reading — a practical next step alongside your university programme, not a replacement for it.";
+  "When you want to go deeper in the subject, we recommend these books for your own reading — a practical next step alongside your university programme, not a replacement for it.";
 
 export const furtherStudy: BibliographyEntry[] = [
   {
