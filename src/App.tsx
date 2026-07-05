@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { BibliographyPanel } from "./components/BibliographyPanel";
 import { CourseNav, useLessonFromSelection, type LessonSelection } from "./components/CourseNav";
 import { LessonContent } from "./components/LessonContent";
 import { courseTitle, systems } from "./data/curriculum";
@@ -90,6 +91,7 @@ export default function App() {
       <p className="overview-hint muted">
         Open a coloured chapter below, then choose a sub-topic to start.
       </p>
+      <BibliographyPanel />
       <button type="button" className="mobile-browse-btn" onClick={() => setMobileMenuOpen(true)}>
         Browse chapters →
       </button>
