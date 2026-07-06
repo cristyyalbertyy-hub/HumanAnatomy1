@@ -59,7 +59,7 @@ export default function App() {
   const showMobileLessonBar = !mobileMenuOpen && !atHome && mobileLessonContext !== null;
   const shellMode = mobileMenuOpen ? "is-mobile-menu" : "is-mobile-content";
 
-  const overviewImage = assetUrl("/HumanAnatomy.png");
+  const overviewImage = assetUrl("/HumanAnatomyA.png");
 
   const overviewPanel = (
     <div className="overview-panel">
