@@ -4,6 +4,7 @@ import { CourseNav, useLessonFromSelection, type LessonSelection } from "./compo
 import { LessonContent } from "./components/LessonContent";
 import { courseTitle, systems } from "./data/curriculum";
 import { assetUrl } from "./utils/assetUrl";
+import { useAuth } from "./context/AuthContext";
 
 function collapsedRecord(ids: string[]): Record<string, boolean> {
   const init: Record<string, boolean> = {};
@@ -12,6 +13,7 @@ function collapsedRecord(ids: string[]): Record<string, boolean> {
 }
 
 export default function App() {
+  const { userEmail, logout } = useAuth();
   const [openSystems, setOpenSystems] = useState(() =>
     collapsedRecord(systems.map((s) => s.id)),
   );
@@ -163,6 +165,18 @@ export default function App() {
           <span className="home-overview-btn__label">Course overview</span>
         </button>
         <h1>{courseTitle}</h1>
+        {userEmail ? (
+          <div className="app-header__actions">
+            <div className="auth-account">
+              <span className="auth-account__email" title={userEmail}>
+                {userEmail}
+              </span>
+              <button type="button" className="btn-ghost" onClick={() => void logout()}>
+                Sair
+              </button>
+            </div>
+          </div>
+        ) : null}
       </header>
 
       {showMobileLessonBar && mobileLessonContext ? (
