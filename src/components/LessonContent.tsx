@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type ResolvedLesson } from "../data/curriculum";
+import { useMediaProgress } from "../hooks/useMediaProgress";
+import { bindPlaybackProgress } from "../lib/playbackProgress";
 import {
   infographicPathCandidates,
   podcastPathCandidates,
@@ -14,16 +16,37 @@ import { Questionnaire } from "./Questionnaire";
 
 type Props = { lesson: ResolvedLesson };
 
+function progressItemKeyFor(lesson: ResolvedLesson): string {
+  if (lesson.topic) return lesson.topic.id;
+  return `${lesson.system.id}/${lesson.section.id}`;
+}
+
 export function LessonContent({ lesson }: Props) {
   const { system, section, topic, assetCode, questionnairePath } = lesson;
   const title = topic?.title ?? section.title;
   const breadcrumb = topic ? `${system.title} › ${section.title}` : system.title;
+  const progressItemKey = progressItemKeyFor(lesson);
+  const { trackWatchComplete } = useMediaProgress(progressItemKey);
 
   const [tab, setTab] = useState<MediaTabId>("video");
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     setTab("video");
   }, [assetCode]);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || tab !== "video") return;
+    return bindPlaybackProgress(el, () => void trackWatchComplete("V"));
+  }, [tab, assetCode, trackWatchComplete]);
+
+  useEffect(() => {
+    const el = audioRef.current;
+    if (!el || tab !== "podcast") return;
+    return bindPlaybackProgress(el, () => void trackWatchComplete("P"));
+  }, [tab, assetCode, trackWatchComplete]);
 
   const videoPaths = videoPathCandidates(assetCode);
   const audioPaths = podcastPathCandidates(assetCode);
@@ -60,6 +83,7 @@ export function LessonContent({ lesson }: Props) {
                 onExhausted={onMissing}
                 render={({ src, onError }) => (
                   <video
+                    ref={videoRef}
                     className="video"
                     controls
                     controlsList="nodownload"
@@ -83,6 +107,7 @@ export function LessonContent({ lesson }: Props) {
                 onExhausted={onMissing}
                 render={({ src, onError }) => (
                   <audio
+                    ref={audioRef}
                     className="audio"
                     controls
                     controlsList="nodownload"
