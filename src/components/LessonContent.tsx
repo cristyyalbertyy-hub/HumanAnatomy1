@@ -21,32 +21,84 @@ function progressItemKeyFor(lesson: ResolvedLesson): string {
   return `${lesson.system.id}/${lesson.section.id}`;
 }
 
+function ProgressVideo({
+  src,
+  onError,
+  onComplete,
+}: {
+  src: string;
+  onError: () => void;
+  onComplete: () => void;
+}) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !src) return;
+    return bindPlaybackProgress(el, onComplete);
+  }, [src, onComplete]);
+
+  return (
+    <video
+      ref={ref}
+      className="video"
+      controls
+      controlsList="nodownload"
+      playsInline
+      preload="metadata"
+      src={src}
+      onError={onError}
+    />
+  );
+}
+
+function ProgressAudio({
+  src,
+  onError,
+  onComplete,
+}: {
+  src: string;
+  onError: () => void;
+  onComplete: () => void;
+}) {
+  const ref = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !src) return;
+    return bindPlaybackProgress(el, onComplete);
+  }, [src, onComplete]);
+
+  return (
+    <audio
+      ref={ref}
+      className="audio"
+      controls
+      controlsList="nodownload"
+      preload="metadata"
+      src={src}
+      onError={onError}
+    >
+      Podcast
+    </audio>
+  );
+}
+
 export function LessonContent({ lesson }: Props) {
-  const { system, section, topic, assetCode, questionnairePath } = lesson;
+  const { section, topic, assetCode, questionnairePath } = lesson;
   const title = topic?.title ?? section.title;
-  const breadcrumb = topic ? `${system.title} › ${section.title}` : system.title;
+  const breadcrumb = topic ? `${lesson.system.title} › ${section.title}` : lesson.system.title;
   const progressItemKey = progressItemKeyFor(lesson);
   const { trackWatchComplete } = useMediaProgress(progressItemKey);
 
   const [tab, setTab] = useState<MediaTabId>("video");
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     setTab("video");
   }, [assetCode]);
 
-  useEffect(() => {
-    const el = videoRef.current;
-    if (!el || tab !== "video") return;
-    return bindPlaybackProgress(el, () => void trackWatchComplete("V"));
-  }, [tab, assetCode, trackWatchComplete]);
-
-  useEffect(() => {
-    const el = audioRef.current;
-    if (!el || tab !== "podcast") return;
-    return bindPlaybackProgress(el, () => void trackWatchComplete("P"));
-  }, [tab, assetCode, trackWatchComplete]);
+  const onVideoComplete = () => void trackWatchComplete("V");
+  const onPodcastComplete = () => void trackWatchComplete("P");
 
   const videoPaths = videoPathCandidates(assetCode);
   const audioPaths = podcastPathCandidates(assetCode);
@@ -82,16 +134,7 @@ export function LessonContent({ lesson }: Props) {
                 urlKey={videoKey}
                 onExhausted={onMissing}
                 render={({ src, onError }) => (
-                  <video
-                    ref={videoRef}
-                    className="video"
-                    controls
-                    controlsList="nodownload"
-                    playsInline
-                    preload="metadata"
-                    src={src}
-                    onError={onError}
-                  />
+                  <ProgressVideo src={src} onError={onError} onComplete={onVideoComplete} />
                 )}
               />
             )}
@@ -106,17 +149,7 @@ export function LessonContent({ lesson }: Props) {
                 urlKey={audioKey}
                 onExhausted={onMissing}
                 render={({ src, onError }) => (
-                  <audio
-                    ref={audioRef}
-                    className="audio"
-                    controls
-                    controlsList="nodownload"
-                    preload="metadata"
-                    src={src}
-                    onError={onError}
-                  >
-                    Podcast
-                  </audio>
+                  <ProgressAudio src={src} onError={onError} onComplete={onPodcastComplete} />
                 )}
               />
             )}
