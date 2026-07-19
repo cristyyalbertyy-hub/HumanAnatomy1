@@ -2,6 +2,17 @@ import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { getAuth, type Auth } from 'firebase/auth'
 import { getFirestore, type Firestore } from 'firebase/firestore'
 
+declare global {
+  interface Window {
+    STUDIO9_FIREBASE?: {
+      apiKey: string
+      authDomain: string
+      projectId: string
+      appId: string
+    }
+  }
+}
+
 export const PACKAGE_ID =
   (import.meta.env.VITE_PACKAGE_ID as string | undefined) ?? 'human-anatomy-1'
 
@@ -14,10 +25,22 @@ export const ACCOUNT_URL =
   'https://medical-science-lilac.vercel.app/conta/'
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string | undefined,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID as string | undefined,
+  apiKey:
+    (import.meta.env.VITE_FIREBASE_API_KEY as string | undefined) ??
+    window.STUDIO9_FIREBASE?.apiKey ??
+    '',
+  authDomain:
+    (import.meta.env.VITE_FIREBASE_AUTH_DOMAIN as string | undefined) ??
+    window.STUDIO9_FIREBASE?.authDomain ??
+    '',
+  projectId:
+    (import.meta.env.VITE_FIREBASE_PROJECT_ID as string | undefined) ??
+    window.STUDIO9_FIREBASE?.projectId ??
+    '',
+  appId:
+    (import.meta.env.VITE_FIREBASE_APP_ID as string | undefined) ??
+    window.STUDIO9_FIREBASE?.appId ??
+    '',
 }
 
 export const isFirebaseConfigured = Boolean(
